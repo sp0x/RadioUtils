@@ -25,7 +25,7 @@ Partial Class Form1
         Me.components = New System.ComponentModel.Container()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.lblSong = New System.Windows.Forms.Label()
-        Me.Button2 = New System.Windows.Forms.Button()
+        Me.BtnPlay = New System.Windows.Forms.Button()
         Me.lblName = New System.Windows.Forms.Label()
         Me.TrackBar1 = New System.Windows.Forms.TrackBar()
         Me.Button1 = New System.Windows.Forms.Button()
@@ -49,12 +49,12 @@ Partial Class Form1
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(153, 217)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(67, 35)
-        Me.Button2.TabIndex = 3
-        Me.Button2.Text = "Play"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.BtnPlay.Location = New System.Drawing.Point(153, 217)
+        Me.BtnPlay.Name = "Button2"
+        Me.BtnPlay.Size = New System.Drawing.Size(67, 35)
+        Me.BtnPlay.TabIndex = 3
+        Me.BtnPlay.Text = "Play"
+        Me.BtnPlay.UseVisualStyleBackColor = True
         '
         'lblName
         '
@@ -111,7 +111,7 @@ Partial Class Form1
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.TrackBar1)
         Me.Controls.Add(Me.lblName)
-        Me.Controls.Add(Me.Button2)
+        Me.Controls.Add(Me.BtnPlay)
         Me.Controls.Add(Me.lblSong)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.Name = "Form1"
@@ -124,7 +124,7 @@ Partial Class Form1
     End Sub
     Friend WithEvents Timer1 As System.Windows.Forms.Timer
     Friend WithEvents lblSong As System.Windows.Forms.Label
-    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents BtnPlay As System.Windows.Forms.Button
     Friend WithEvents lblName As System.Windows.Forms.Label
     Friend WithEvents TrackBar1 As System.Windows.Forms.TrackBar
     Friend WithEvents Button1 As System.Windows.Forms.Button

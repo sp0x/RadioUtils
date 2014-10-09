@@ -3,14 +3,13 @@ Imports System.Threading
 
 
 Public Class Form1
-   Public BSRDPLS() As RadioPlayer
+    Public BSRDPLS() As BSRDPlay
 
 #Region "Initiation and config"
 
     Public Sub ConfigSound()
         Call BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1) ' enable playlist processing
         Call BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0) ' minimize automatic pre-buffering, so we can do it (and display it) instead
-        Call BASS_SetConfigPtr(BASS_CONFIG_NET_PROXY, 0)  ' setup proxy server location
         '    Call BASS_SetConfigPtr(BASS_CONFIG_NET_PROXY, 0)  ' setup proxy server location
     End Sub
 
@@ -38,17 +37,22 @@ Public Class Form1
         Dim err As Int64 = BASS_ErrorGetCode
         err = err
     End Sub
+<<<<<<< Updated upstream
     Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        Dim bs As New BSRDPlay(New BSRDPlay.UpInfo(AddressOf UpdateSongInfo), Me.TextBox1.Text)
+=======
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnPlay.Click
         Dim bs As New RadioPlayer(New RadioPlayer.UpInfo(AddressOf UpdateSongInfo), Me.TextBox1.Text)
+>>>>>>> Stashed changes
 
         'Me.Url = TextBox1.Text
-        Dim th As New Threading.Thread(AddressOf bs.LoadRadioTHR) With {.IsBackground = True}
+        Dim th As New Threading.Thread(AddressOf bs.Play) With {.IsBackground = True}
         th.Start()
     End Sub
 
     Public Sub UpdateSongInfo(ByVal txt As String, ByVal name As String, ByVal sngname As String, ByVal px As Image)
         If Me.InvokeRequired Then
-            Me.Invoke(New RadioPlayer.UpInfo(AddressOf UpdateSongInfo), txt, name, sngname, px)
+            Me.Invoke(New BSRDPlay.UpInfo(AddressOf UpdateSongInfo), txt, name, sngname, px)
         Else
             Me.PictureBox1.Image = px
             Me.Text = txt

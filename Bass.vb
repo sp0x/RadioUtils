@@ -641,7 +641,7 @@ Public Module Bass
     Declare Function BASS_GetDeviceDescription Lib "bass.dll" (ByVal devnum As Integer) As IntPtr
 
 
-    Declare Function BASS_SetConfigPtr Lib "bass.dll" (ByVal opt As Long, ByVal value As Object) As Long
+    Declare Function BASS_SetConfigPtr Lib "bass.dll" (opt As Long, value As Object) As Long
     Declare Function BASS_GetConfigPtr Lib "bass.dll" (ByVal opt As Long) As Long
     '   Declare Function BASS_GetVersion Lib "bass.dll" () As IntPtr
     Declare Function BASS_ErrorGetCode Lib "bass.dll" () As Long
