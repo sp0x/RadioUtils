@@ -1,0 +1,34 @@
+Public Enum BassTag
+    BassTagAdxLoop = &H12000
+    BassTagApe = 6
+    BassTagApeBinary = &H1000
+    BassTagCaCodec = 11
+    BassTagFlacCue = 12
+    BassTagFlacPicture = &H12000
+    BassTagHttp = 3
+    BassTagIcy = 4
+    BassTagId3 = 0
+    BassTagId3V2 = 1
+    BassTagLyrics3 = 10
+    BassTagMeta = 5
+    BassTagMf = 13
+    BassTagMidiTrack = &H11000
+    BassTagMp4 = 7
+    BassTagMusicInst = &H10100
+    BassTagMusicMessage = &H10001
+    BassTagMusicName = &H10000
+    BassTagMusicOrders = &H10002
+    BassTagMusicSample = &H10300
+    BassTagOgg = 2
+    BassTagRiffBext = &H101
+    BassTagRiffCart = &H102
+    BassTagRiffDisp = &H103
+    BassTagRiffInfo = &H100
+    BassTagUnknown = -1
+    BassTagVendor = 9
+    BassTagWaveformat = 14
+    BassTagWma = 8
+    BassTagWmaCodec = 12
+    BassTagWmaMeta = 11
+End Enum
+

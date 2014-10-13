@@ -1,5 +1,5 @@
-﻿Imports System.Text
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
+Imports System.Text
 
 Public Module Bass
     ' BASS 2.4 Visual Basic module
@@ -22,43 +22,45 @@ Public Module Bass
     Public Const BASSTRUE As Long = 1   'Use this instead of VB Booleans
     Public Const BASSFALSE As Long = 0  'Use this instead of VB Booleans
 
-    ' Error codes returned by BASS_ErrorGetCode
-    Public Const BASS_OK = 0               'all is OK
-    Public Const BASS_ERROR_MEM = 1        'memory error
-    Public Const BASS_ERROR_FILEOPEN = 2   'can't open the file
-    Public Const BASS_ERROR_DRIVER = 3     'can't find a free sound driver
-    Public Const BASS_ERROR_BUFLOST = 4    'the sample buffer was lost
-    Public Const BASS_ERROR_HANDLE = 5     'invalid handle
-    Public Const BASS_ERROR_FORMAT = 6     'unsupported sample format
-    Public Const BASS_ERROR_POSITION = 7   'invalid position
-    Public Const BASS_ERROR_INIT = 8       'BASS_Init has not been successfully called
-    Public Const BASS_ERROR_START = 9      'BASS_Start has not been successfully called
-    Public Const BASS_ERROR_ALREADY = 14   'already initialized/paused/whatever
-    Public Const BASS_ERROR_NOCHAN = 18    'can't get a free channel
-    Public Const BASS_ERROR_ILLtype = 19   'an illegalPublic Structure was specified
-    Public Const BASS_ERROR_ILLPARAM = 20  'an illegal parameter was specified
-    Public Const BASS_ERROR_NO3D = 21      'no 3D support
-    Public Const BASS_ERROR_NOEAX = 22     'no EAX support
-    Public Const BASS_ERROR_DEVICE = 23    'illegal device number
-    Public Const BASS_ERROR_NOPLAY = 24    'not playing
-    Public Const BASS_ERROR_FREQ = 25      'illegal sample rate
-    Public Const BASS_ERROR_NOTFILE = 27   'the stream is not a file stream
-    Public Const BASS_ERROR_NOHW = 29      'no hardware voices available
-    Public Const BASS_ERROR_EMPTY = 31     'the MOD music has no sequence data
-    Public Const BASS_ERROR_NONET = 32     'no internet connection could be opened
-    Public Const BASS_ERROR_CREATE = 33    'couldn't create the file
-    Public Const BASS_ERROR_NOFX = 34      'effects are not available
-    Public Const BASS_ERROR_NOTAVAIL = 37  'requested data is not available
-    Public Const BASS_ERROR_DECODE = 38    'the channel is a "decoding channel"
-    Public Const BASS_ERROR_DX = 39        'a sufficient DirectX version is not installed
-    Public Const BASS_ERROR_TIMEOUT = 40   'connection timedout
-    Public Const BASS_ERROR_FILEFORM = 41  'unsupported file format
-    Public Const BASS_ERROR_SPEAKER = 42   'unavailable speaker
-    Public Const BASS_ERROR_VERSION = 43   'invalid BASS version (used by add-ons)
-    Public Const BASS_ERROR_CODEC = 44     'codec is not available/supported
-    Public Const BASS_ERROR_ENDED = 45     'the channel/file has ended
-    Public Const BASS_ERROR_BUSY = 46      'the device is busy
-    Public Const BASS_ERROR_UNKNOWN = -1   'some other mystery problem
+    Public Enum BassError
+        'Error codes returned by BASS_ErrorGetCode
+        OK = 0               'all is OK
+        MEM = 1        'memory error
+        FILEOPEN = 2   'can't open the file
+        DRIVER = 3     'can't find a free sound driver
+        BUFLOST = 4    'the sample buffer was lost
+        HANDLE = 5     'invalid handle
+        FORMAT = 6     'unsupported sample format
+        POSITION = 7   'invalid position
+        INIT = 8       'BASS_Init has not been successfully called
+        START = 9      'BASS_Start has not been successfully called
+        ALREADY = 14   'already initialized/paused/whatever
+        NOCHAN = 18    'can't get a free channel
+        ILLtype = 19   'an illegalPublic Structure was specified
+        ILLPARAM = 20  'an illegal parameter was specified
+        NO3D = 21      'no 3D support
+        NOEAX = 22     'no EAX support
+        DEVICE = 23    'illegal device number
+        NOPLAY = 24    'not playing
+        FREQ = 25      'illegal sample rate
+        NOTFILE = 27   'the stream is not a file stream
+        NOHW = 29      'no hardware voices available
+        EMPTY = 31     'the MOD music has no sequence data
+        NONET = 32     'no internet connection could be opened
+        CREATE = 33    'couldn't create the file
+        NOFX = 34      'effects are not available
+        NOTAVAIL = 37  'requested data is not available
+        DECODE = 38    'the channel is a "decoding channel"
+        DX = 39        'a sufficient DirectX version is not installed
+        TIMEOUT = 40   'connection timedout
+        FILEFORM = 41  'unsupported file format
+        SPEAKER = 42   'unavailable speaker
+        VERSION = 43   'invalid BASS version (used by add-ons)
+        CODEC = 44     'codec is not available/supported
+        ENDED = 45     'the channel/file has ended
+        BUSY = 46      'the device is busy
+        UNKNOWN = -1   'some other mystery problem
+    End Enum
 
     ' BASS_SetConfig options
     Public Const BASS_CONFIG_BUFFER = 0
@@ -351,7 +353,7 @@ Public Module Bass
 
     ' special STREAMPROCs
     Public Const STREAMPROC_DUMMY = 0 ' "dummy" stream
-    Public Const STREAMPROC_PUSH = -1 ' push stream
+    Public Const STREAMPROC_PUSH = - 1 ' push stream
 
     ' BASS_StreamCreateFileUser file systems
     Public Const STREAMFILE_NOBUFFER = 0
@@ -628,27 +630,128 @@ Public Module Bass
         BASS_CONFIG_NET_BUFFER = 12
     End Enum    ' BassConfigOptions
 
-    Declare Function BASS_SetConfig Lib "bass.dll" (ByVal opt As BassConfigOptions, ByVal value As Integer) As Integer
-    Declare Function BASS_GetConfig Lib "bass.dll" (ByVal opt As BassConfigOptions) As Integer
+#Region "Config"
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_SetConfig([option] As BASSConfig, <[In], MarshalAs(UnmanagedType.Bool)> newvalue As Boolean) As Boolean
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_SetConfig([option] As BASSConfig, newvalue As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_SetConfigPtr([option] As BASSConfig, newvalue As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+
+    Public Enum BASSConfig
+        BASS_CONFIG_3DALGORITHM = 10
+        BASS_CONFIG_AAC_MP4 = &H10701
+        BASS_CONFIG_AC3_DYNRNG = &H10001
+        BASS_CONFIG_ASYNCFILE_BUFFER = &H2D
+        BASS_CONFIG_BUFFER = 0
+        BASS_CONFIG_CD_AUTOSPEED = &H10202
+        BASS_CONFIG_CD_CDDB_SERVER = &H10204
+        BASS_CONFIG_CD_FREEOLD = &H10200
+        BASS_CONFIG_CD_RETRY = &H10201
+        BASS_CONFIG_CD_SKIPERROR = &H10203
+        BASS_CONFIG_CURVE_PAN = 8
+        BASS_CONFIG_CURVE_VOL = 7
+        BASS_CONFIG_DEV_BUFFER = &H1B
+        BASS_CONFIG_DEV_DEFAULT = &H24
+        BASS_CONFIG_ENCODE_ACM_LOAD = &H10302
+        BASS_CONFIG_ENCODE_CAST_PROXY = &H10311
+        BASS_CONFIG_ENCODE_CAST_TIMEOUT = &H10310
+        BASS_CONFIG_ENCODE_PRIORITY = &H10300
+        BASS_CONFIG_ENCODE_QUEUE = &H10301
+        BASS_CONFIG_FLOATDSP = 9
+        BASS_CONFIG_GVOL_MUSIC = 6
+        BASS_CONFIG_GVOL_SAMPLE = 4
+        BASS_CONFIG_GVOL_STREAM = 5
+        BASS_CONFIG_HANDLES = &H29
+        BASS_CONFIG_MF_VIDEO = &H30
+        BASS_CONFIG_MIDI_AUTOFONT = &H10402
+        BASS_CONFIG_MIDI_COMPACT = &H10400
+        BASS_CONFIG_MIDI_DEFFONT = &H10403
+        BASS_CONFIG_MIDI_VOICES = &H10401
+        BASS_CONFIG_MIXER_BUFFER = &H10601
+        BASS_CONFIG_MIXER_FILTER = &H10600
+        BASS_CONFIG_MIXER_POSEX = &H10602
+        BASS_CONFIG_MP3_ERRORS = &H23
+        BASS_CONFIG_MP4_VIDEO = &H10700
+        BASS_CONFIG_MUSIC_VIRTUAL = &H16
+        BASS_CONFIG_NET_AGENT = &H10
+        BASS_CONFIG_NET_BUFFER = 12
+        BASS_CONFIG_NET_PASSIVE = &H12
+        BASS_CONFIG_NET_PLAYLIST = &H15
+        BASS_CONFIG_NET_PREBUF = 15
+        BASS_CONFIG_NET_PROXY = &H11
+        BASS_CONFIG_NET_READTIMEOUT = &H25
+        BASS_CONFIG_NET_TIMEOUT = 11
+        BASS_CONFIG_OGG_PRESCAN = &H2F
+        BASS_CONFIG_PAUSE_NOPLAY = 13
+        BASS_CONFIG_REC_BUFFER = &H13
+        BASS_CONFIG_SPLIT_BUFFER = &H10610
+        BASS_CONFIG_SRC = &H2B
+        BASS_CONFIG_SRC_SAMPLE = &H2C
+        BASS_CONFIG_UNICODE = &H2A
+        BASS_CONFIG_UPDATEPERIOD = 1
+        BASS_CONFIG_UPDATETHREADS = &H18
+        BASS_CONFIG_VERIFY = &H17
+        BASS_CONFIG_VISTA_SPEAKERS = &H26
+        BASS_CONFIG_VISTA_TRUEPOS = 30
+        BASS_CONFIG_WINAMP_INPUT_TIMEOUT = &H10800
+        BASS_CONFIG_WMA_ASYNC = &H1010F
+        BASS_CONFIG_WMA_BASSFILE = &H10103
+        BASS_CONFIG_WMA_NETSEEK = &H10104
+        BASS_CONFIG_WMA_PREBUF = &H10101
+        BASS_CONFIG_WMA_VIDEO = &H10105
+    End Enum
+
+
+#End Region
+
 
     ' Retrieve the version number of BASS that is loaded. RETURN : The BASS version (LOWORD.HIWORD)
-    Declare Function BASS_GetVersion Lib "bass.dll" () As Integer
+    Declare Function BASS_GetVersion Lib "bass.dll"() As Integer
+    
 
-    ' Gets a pointer to the text description of a device. This function can be used to enumerate the available devices.
-    ' devnum: The device (0=First)
-    ' RETURN : The text description of the device (NULL=error)
-    ' NOTE: use BASS_GetDeviceDestriptionString to get the text description
-    Declare Function BASS_GetDeviceDescription Lib "bass.dll" (ByVal devnum As Integer) As IntPtr
-
-
-    Declare Function BASS_SetConfigPtr Lib "bass.dll" (opt As Long, value As Object) As Long
-    Declare Function BASS_GetConfigPtr Lib "bass.dll" (ByVal opt As Long) As Long
-    '   Declare Function BASS_GetVersion Lib "bass.dll" () As IntPtr
-    Declare Function BASS_ErrorGetCode Lib "bass.dll" () As Long
+    Declare Function BASS_ErrorGetCode Lib "bass.dll"() As Int32
     '  Declare Function BASS_GetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) As IntPtr
 
-    ' Declare Function BASS_Init Lib "bass.dll" (ByVal device As Long, ByVal freq As Long, ByVal flags As Long, ByVal win As IntPtr, ByVal clsid As Long) As IntPtr
-    Declare Function BASS_Init Lib "bass.dll" (ByVal device As Integer, ByVal freq As Integer, ByVal flags As Bass_Device, ByVal win As Integer, ByVal guid As Integer) As BassBool
+#Region "Bass Init"
+    Public Function BASS_Init(device As Integer, freq As Integer, flags As BASSInit, win As IntPtr) As Boolean
+        Return BASS_Init(device, freq, flags, win, IntPtr.Zero)
+    End Function
+
+    Public Function BASS_Init(device As Integer, freq As Integer, flags As BASSInit, win As IntPtr, clsid As System.Guid) As Boolean
+        If clsid.Equals(System.Guid.Empty) Then
+            Return BASS_Init(device, freq, flags, win, IntPtr.Zero)
+        End If
+        Return BASS_InitGuid(device, freq, flags, win, clsid)
+    End Function
+
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Private Function BASS_Init(a0 As Integer, a1 As Integer, a2 As BASSInit, a3 As IntPtr, a4 As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+    <DllImport("bass.dll", EntryPoint:="BASS_Init", CharSet:=CharSet.Auto)> _
+    Private Function BASS_InitGuid(a0 As Integer, a1 As Integer, a2 As BASSInit, a3 As IntPtr, <MarshalAs(UnmanagedType.LPStruct)> A_4 As System.Guid) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+
+    <Flags> _
+    Public Enum BASSInit
+        BassDevice_3D = 4
+        BassDevice_8Bits = 1
+        BassDeviceCpspeakers = &H400
+        BassDeviceDefault = 0
+        BassDeviceFreq = &H4000
+        BassDeviceLatency = &H100
+        BassDeviceMono = 2
+        BassDeviceNospeaker = &H1000
+        BassDeviceSpeakers = &H800
+        BassDevideDmix = &H2000
+    End Enum
+
+#End Region
+
+
 
     Public Enum Bass_Device
         '**********************
@@ -669,43 +772,51 @@ Public Module Bass
         Device_Speakers = 2048    'force Enabling Of Speaker Assignment
     End Enum    ' Bass_Device
 
-    Public Enum BassBool
-        BassFalse = 0
-        BassTrue = 1
-    End Enum    ' BassBool
 
-    Declare Function BASS_SetDevice Lib "bass.dll" (ByVal device As Long) As IntPtr
-    Declare Function BASS_GetDevice Lib "bass.dll" () As IntPtr
-    Declare Function BASS_Free Lib "bass.dll" () As Long
-    Declare Function BASS_GetDSoundObject Lib "bass.dll" (ByVal any As Long) As Long
-    Declare Function BASS_GetInfo Lib "bass.dll" (ByRef info As BASS_INFO) As Long
-    Declare Function BASS_Update Lib "bass.dll" (ByVal legnth As Long) As Long
-    Declare Function BASS_GetCPU Lib "bass.dll" () As Single
-    Declare Function BASS_Start Lib "bass.dll" () As Long
-    Declare Function BASS_Stop Lib "bass.dll" () As Long
-    Declare Function BASS_Pause Lib "bass.dll" () As Long
+#Region "Volume"
     ' Set the digital output master volume.
     ' volume : Desired volume level (0-100)
-    Declare Function BASS_SetVolume Lib "bass.dll" (ByVal volume As Integer) As BassBool
-    Declare Function BASS_GetVolume Lib "bass.dll" () As Single
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_SetVolume(volume As Single) As Boolean
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_GetVolume() As Single
+    End Function
+#End Region
+
 
     Declare Function BASS_PluginLoad Lib "bass.dll" (ByVal filename As String, ByVal flags As Long) As Long
     Declare Function BASS_PluginFree Lib "bass.dll" (ByVal handle As Long) As Long
     Declare Function BASS_PluginGetInfo_ Lib "bass.dll" Alias "BASS_PluginGetInfo" (ByVal handle As Long) As Long
 
-    Declare Function BASS_Set3DFactors Lib "bass.dll" (ByVal distf As Single, ByVal rollf As Single, ByVal doppf As Single) As Long
-    Declare Function BASS_Get3DFactors Lib "bass.dll" (ByRef distf As Single, ByRef rollf As Single, ByRef doppf As Single) As Long
-    Declare Function BASS_Set3DPosition Lib "bass.dll" (ByRef pos As Object, ByRef vel As Object, ByRef front As Object, ByRef top As Object) As Long
-    Declare Function BASS_Get3DPosition Lib "bass.dll" (ByRef pos As Object, ByRef vel As Object, ByRef front As Object, ByRef top As Object) As Long
+    Declare Function BASS_Set3DFactors Lib "bass.dll" (ByVal distf As Single, ByVal rollf As Single,
+                                                      ByVal doppf As Single) As Long
+    Declare Function BASS_Get3DFactors Lib "bass.dll" (ByRef distf As Single, ByRef rollf As Single,
+                                                      ByRef doppf As Single) As Long
+    Declare Function BASS_Set3DPosition Lib "bass.dll" (ByRef pos As Object, ByRef vel As Object, ByRef front As Object,
+                                                       ByRef top As Object) As Long
+    Declare Function BASS_Get3DPosition Lib "bass.dll" (ByRef pos As Object, ByRef vel As Object, ByRef front As Object,
+                                                       ByRef top As Object) As Long
     Declare Function BASS_Apply3D Lib "bass.dll" () As Long
-    Declare Function BASS_SetEAXParameters Lib "bass.dll" (ByVal env As Long, ByVal vol As Single, ByVal decay As Single, ByVal damp As Single) As Long
-    Declare Function BASS_GetEAXParameters Lib "bass.dll" (ByRef env As Long, ByRef vol As Single, ByRef decay As Single, ByRef damp As Single) As Long
+    Declare Function BASS_SetEAXParameters Lib "bass.dll" (ByVal env As Long, ByVal vol As Single, ByVal decay As Single,
+                                                          ByVal damp As Single) As Long
+    Declare Function BASS_GetEAXParameters Lib "bass.dll" (ByRef env As Long, ByRef vol As Single, ByRef decay As Single,
+                                                          ByRef damp As Single) As Long
 
-    Declare Function BASS_MusicLoad64 Lib "bass.dll" Alias "BASS_MusicLoad" (ByVal mem As Long, ByVal file As Object, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
+    Declare Function BASS_MusicLoad64 Lib "bass.dll" Alias "BASS_MusicLoad" (ByVal mem As Long, ByVal file As Object,
+                                                                            ByVal offset As Long,
+                                                                            ByVal offsethigh As Long,
+                                                                            ByVal length As Long, ByVal flags As Long,
+                                                                            ByVal freq As Long) As Long
     Declare Function BASS_MusicFree Lib "bass.dll" (ByVal handle As Long) As Long
 
-    Declare Function BASS_SampleLoad64 Lib "bass.dll" Alias "BASS_SampleLoad" (ByVal mem As Long, ByVal file As Object, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
-    Declare Function BASS_SampleCreate Lib "bass.dll" (ByVal length As Long, ByVal freq As Long, ByVal chans As Long, ByVal max As Long, ByVal flags As Long) As Long
+    Declare Function BASS_SampleLoad64 Lib "bass.dll" Alias "BASS_SampleLoad" (ByVal mem As Long, ByVal file As Object,
+                                                                              ByVal offset As Long,
+                                                                              ByVal offsethigh As Long,
+                                                                              ByVal length As Long, ByVal max As Long,
+                                                                              ByVal flags As Long) As Long
+    Declare Function BASS_SampleCreate Lib "bass.dll" (ByVal length As Long, ByVal freq As Long, ByVal chans As Long,
+                                                      ByVal max As Long, ByVal flags As Long) As Long
     Declare Function BASS_SampleFree Lib "bass.dll" (ByVal handle As Long) As Long
     Declare Function BASS_SampleSetData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Object) As Long
     Declare Function BASS_SampleGetData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Object) As Long
@@ -715,8 +826,36 @@ Public Module Bass
     Declare Function BASS_SampleGetChannels Lib "bass.dll" (ByVal handle As Long, ByRef CHANNELS As Long) As Long
     Declare Function BASS_SampleStop Lib "bass.dll" (ByVal handle As Long) As Long
 
-    Declare Function BASS_StreamCreate Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
-    Declare Function BASS_StreamCreateFile64 Lib "bass.dll" Alias "BASS_StreamCreateFile" (ByVal mem As Long, ByVal file As Object, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal lengthhigh As Long, ByVal flags As Long) As Long
+    Public Function BASS_StreamCreate(freq As Integer, chans As Integer, flags As BassFlag, proc As IntPtr) As Integer
+        Return BASS_StreamCreatePtr(freq, chans, flags, New IntPtr(CInt(proc)), IntPtr.Zero)
+    End Function
+
+
+    Public Function BASS_StreamCreateFile(memory As IntPtr, offset As Long, length As Long, flags As BassFlag) As Integer
+        Return BASS_StreamCreateFileMemory(True, memory, offset, length, flags)
+    End Function
+
+    Public Function BASS_StreamCreateFile(file As String, offset As Long, length As Long, flags As BassFlag) As Integer
+        flags = flags Or BassFlag.BassDefault Or BassFlag.BASS_UNICODE
+        Return BASS_StreamCreateFileUnicode(False, file, offset, length, flags)
+    End Function
+
+    <DllImport("bass.dll", EntryPoint:="BASS_StreamCreateFile", CharSet:=CharSet.Auto)> _
+    Private Function BASS_StreamCreateFileMemory(<MarshalAs(UnmanagedType.Bool)> A_0 As Boolean, A_1 As IntPtr, A_2 As Long, A_3 As Long, A_4 As BassFlag) As Integer
+    End Function
+    <DllImport("bass.dll", EntryPoint:="BASS_StreamCreateFile", CharSet:=CharSet.Auto)> _
+    Private Function BASS_StreamCreateFileUnicode(<MarshalAs(UnmanagedType.Bool)> A_0 As Boolean, <[In], MarshalAs(UnmanagedType.LPWStr)> A_1 As String, A_2 As Long, A_3 As Long, A_4 As BassFlag) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamCreateFileUser(system As BASSStreamSystem, flags As BassFlag, procs As BASS_FILEPROCS, user As IntPtr) As Integer
+    End Function
+    Public Enum BassStreamSystem
+        StreamfileNobuffer
+        StreamfileBuffer
+        StreamfileBufferpush
+    End Enum
+
+
 
 
     ' Declare Function BASS_StreamCreateURL Lib "bass.dll" (ByVal url As String, ByVal offset As Int32, ByVal flags As Int32, ByVal proc As DOWNLOADPROC_Handler, ByVal user As Int32) As Int32
@@ -730,54 +869,148 @@ Public Module Bass
     ' proc   : The callback function. Use AddressOf
     ' user   : The 'user' value passed to the callback function
     ' RETURN : The created stream's handle (NULL=error)
-    Declare Function BASS_StreamCreateURL Lib "bass.dll" (ByVal url As String, ByVal offset As Integer, ByVal flags As Integer, ByVal proc As DOWNLOADPROC_Handler, ByVal user As Integer) As Integer
+    Public Function BASS_StreamCreateURL(url As String, offset As Integer, flags As BASSFlag, proc As DOWNLOADPROC, user As IntPtr) As Integer
+        flags = flags Or BASSFlag.BassDefault Or BASSFlag.BASS_UNICODE
+        Dim num As Integer = BASS_StreamCreateURLUnicode(url, offset, flags, proc, user)
+        If num = 0 Then
+            flags = flags And BASSFlag.BassAsyncfile Or BASSFlag.BASS_SPEAKER_REAR2RIGHT Or BASSFlag.BASS_SPEAKER_CENTER Or BASSFlag.BassDshowStreamLoop Or BASSFlag.BassMidiSincinter Or BASSFlag.BassAacStereo Or BASSFlag.BassMusicDecode Or BASSFlag.BassMusicNosample Or BASSFlag.BassDshowNoaudioProc Or BASSFlag.BassMusicAutofree Or BASSFlag.BASS_SAMPLE_OVER_DIST Or BASSFlag.BassMidiNocrop Or BASSFlag.BassMidiDecayseek Or BASSFlag.BassMidiNofx Or BASSFlag.BassMidiDecayend Or BASSFlag.BassAc3DynamicRange Or BASSFlag.BassAc3DownmixDolby Or BASSFlag.BassMusicFloat Or BASSFlag.BassMusicFx Or BASSFlag.BASS_SAMPLE_VAM Or BASSFlag.BassSampleMutemax Or BASSFlag.BASS_SAMPLE_SOFTWARE Or BASSFlag.BassMusic_3D Or BASSFlag.BassMusicLoop Or BASSFlag.BassFxBpmMult2 Or BASSFlag.BassFxBpmBkgrnd
+            num = BASS_StreamCreateURLAscii(url, offset, flags, proc, user)
+        End If
+        Return num
+    End Function
+
+    <DllImport("bass.dll", EntryPoint:="BASS_StreamCreateURL", CharSet:=CharSet.Auto)> _
+    Private Function BASS_StreamCreateURLAscii(<[In], MarshalAs(UnmanagedType.LPStr)> A_0 As String, A_1 As Integer, A_2 As BASSFlag, A_3 As DOWNLOADPROC, A_4 As IntPtr) As Integer
+    End Function
+    <DllImport("bass.dll", EntryPoint:="BASS_StreamCreateURL", CharSet:=CharSet.Auto)> _
+    Private Function BASS_StreamCreateURLUnicode(<[In], MarshalAs(UnmanagedType.LPWStr)> A_0 As String, A_1 As Integer, A_2 As BASSFlag, A_3 As DOWNLOADPROC, A_4 As IntPtr) As Integer
+    End Function
 
 
-    Declare Function BASS_StreamCreateFileUser Lib "bass.dll" (ByVal system As Long, ByVal flags As Long, ByVal procs As Long, ByVal user As Long) As Long
-    Declare Function BASS_StreamFree Lib "bass.dll" (ByVal handle As Long) As Long
-    Declare Function BASS_StreamGetFilePosition Lib "bass.dll" (ByVal handle As Long, ByVal mode As Long) As Long
-    Declare Function BASS_StreamPutData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Object, ByVal length As Long) As Long
-    Declare Function BASS_StreamPutFileData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Object, ByVal length As Long) As Long
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_Free() As Boolean
+    End Function
 
-    Declare Function BASS_RecordGetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) As Long
+
+
+    Declare Function BASS_StreamCreateFileUser Lib "bass.dll" (ByVal system As Long, ByVal flags As Long,
+                                                              ByVal procs As Long, ByVal user As Long) As Long
+    Declare Function BASS_StreamFree Lib "bass.dll" (ByVal handle As IntPtr) As Long
+    Declare Function BASS_StreamGetFilePosition Lib "bass.dll" (ByVal handle As IntPtr,
+                                                               ByVal mode As BASSStreamFilePosition) As Long
+   
+    Declare Function BASS_RecordGetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) _
+        As Long
     Declare Function BASS_RecordInit Lib "bass.dll" (ByVal device As Long) As Long
     Declare Function BASS_RecordSetDevice Lib "bass.dll" (ByVal device As Long) As Long
     Declare Function BASS_RecordGetDevice Lib "bass.dll" () As Long
     Declare Function BASS_RecordFree Lib "bass.dll" () As Long
     Declare Function BASS_RecordGetInfo Lib "bass.dll" (ByRef info As BassRecordinfo) As Long
     Declare Function BASS_RecordGetInputName Lib "bass.dll" (ByVal inputn As Long) As Long
-    Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long, ByVal volume As Single) As Long
+    Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long,
+                                                        ByVal volume As Single) As Long
     Declare Function BASS_RecordGetInput Lib "bass.dll" (ByVal inputn As Long, ByRef volume As Single) As Long
-    Declare Function BASS_RecordStart Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
+    Declare Function BASS_RecordStart Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long,
+                                                     ByVal proc As Long, ByVal user As Long) As Long
 
-    Declare Function BASS_ChannelBytes2Seconds64 Lib "bass.dll" Alias "BASS_ChannelBytes2Seconds" (ByVal handle As Long, ByVal pos As Long, ByVal poshigh As Long) As Double
+    <Flags> _
+    Public Enum BASSMode
+        BASS_MIDI_DECAYSEEK = &H4000
+        BASS_MIXER_NORAMPIN = &H800000
+        BASS_MUSIC_POSRESET = &H8000
+        BASS_MUSIC_POSRESETEX = &H400000
+        BASS_POS_BYTES = 0
+        BASS_POS_CD_TRACK = 4
+        BASS_POS_DECODE = &H10000000
+        BASS_POS_DECODETO = &H20000000
+        BASS_POS_MIDI_TICK = 2
+        BASS_POS_MUSIC_ORDERS = 1
+        BASS_POS_OGG = 3
+    End Enum
+
+
+#Region "Channels"
+
+
+    Declare Function BASS_ChannelBytes2Seconds64 Lib "bass.dll" Alias "BASS_ChannelBytes2Seconds" (ByVal handle As Long,
+                                                                                                  ByVal pos As Long,
+                                                                                                  ByVal poshigh As Long) _
+        As Double
     Declare Function BASS_ChannelSeconds2Bytes Lib "bass.dll" (ByVal handle As Long, ByVal pos As Double) As Long
     Declare Function BASS_ChannelGetDevice Lib "bass.dll" (ByVal handle As Long) As Long
     Declare Function BASS_ChannelSetDevice Lib "bass.dll" (ByVal handle As Long, ByVal device As Long) As Long
     Declare Function BASS_ChannelIsActive Lib "bass.dll" (ByVal handle As Long) As Long
     Declare Function BASS_ChannelGetInfo Lib "bass.dll" (ByVal handle As Long, ByRef info As BASS_CHANNELINFO) As Long
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetTags(handle As Integer, tags As BassTag) As IntPtr
+    End Function
 
-    Declare Function BASS_ChannelGetTags Lib "bass.dll" (ByVal handle As IntPtr, ByVal tags As Long) As IntPtr
 
-    Declare Function BASS_ChannelFlags Lib "bass.dll" (ByVal handle As Long, ByVal flags As Long, ByVal mask As Long) As Long
+    Declare Function BASS_ChannelFlags Lib "bass.dll" (ByVal handle As Long, ByVal flags As Long, ByVal mask As Long) _
+        As Long
     Declare Function BASS_ChannelUpdate Lib "bass.dll" (ByVal handle As Long, ByVal length As Long) As Long
     Declare Function BASS_ChannelLock Lib "bass.dll" (ByVal handle As Long, ByVal lock_ As Long) As Long
-    Declare Function BASS_ChannelPlay Lib "bass.dll" (ByVal handle As Long, ByVal restart As Long) As Long
-    Declare Function BASS_ChannelStop Lib "bass.dll" (ByVal handle As Long) As Long
-    Declare Function BASS_ChannelPause Lib "bass.dll" (ByVal handle As Long) As Long
-    Declare Function BASS_ChannelSetAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByVal value As Single) As Long
-    Declare Function BASS_ChannelGetAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByRef value As Single) As Long
-    Declare Function BASS_ChannelSlideAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByVal value As Single, ByVal time As Long) As Long
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelPlay(handle As Integer, <MarshalAs(UnmanagedType.Bool)> restart As Boolean) As Boolean
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelStop(handle As IntPtr) As Boolean
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelPause(handle As IntPtr) As Boolean
+    End Function
+
+
+
     Declare Function BASS_ChannelIsSliding Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long) As Long
-    Declare Function BASS_ChannelSet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByVal mode As Long, ByVal min As Single, ByVal max As Single, ByVal iangle As Long, ByVal oangle As Long, ByVal outvol As Single) As Long
-    Declare Function BASS_ChannelGet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByRef mode As Long, ByRef min As Single, ByRef max As Single, ByRef iangle As Long, ByRef oangle As Long, ByRef outvol As Single) As Long
-    Declare Function BASS_ChannelSet3DPosition Lib "bass.dll" (ByVal handle As Long, ByRef pos As Object, ByRef orient As Object, ByRef vel As Object) As Long
-    Declare Function BASS_ChannelGet3DPosition Lib "bass.dll" (ByVal handle As Long, ByRef pos As Object, ByRef orient As Object, ByRef vel As Object) As Long
+    Declare Function BASS_ChannelSet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByVal mode As Long,
+                                                                ByVal min As Single, ByVal max As Single,
+                                                                ByVal iangle As Long, ByVal oangle As Long,
+                                                                ByVal outvol As Single) As Long
+    Declare Function BASS_ChannelGet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByRef mode As Long,
+                                                                ByRef min As Single, ByRef max As Single,
+                                                                ByRef iangle As Long, ByRef oangle As Long,
+                                                                ByRef outvol As Single) As Long
+    Declare Function BASS_ChannelSet3DPosition Lib "bass.dll" (ByVal handle As Long, ByRef pos As Object,
+                                                              ByRef orient As Object, ByRef vel As Object) As Long
+    Declare Function BASS_ChannelGet3DPosition Lib "bass.dll" (ByVal handle As Long, ByRef pos As Object,
+                                                              ByRef orient As Object, ByRef vel As Object) As Long
     Declare Function BASS_ChannelGetLength Lib "bass.dll" (ByVal handle As Long, ByVal mode As Long) As Long
-    Declare Function BASS_ChannelSetPosition64 Lib "bass.dll" Alias "BASS_ChannelSetPosition" (ByVal handle As Long, ByVal pos As Long, ByVal poshigh As Long, ByVal mode As Long) As Long
-    Declare Function BASS_ChannelGetPosition Lib "bass.dll" (ByVal handle As Long, ByVal mode As Long) As Long
+    Declare Function BASS_ChannelSetPosition64 Lib "bass.dll" Alias "BASS_ChannelSetPosition" (ByVal handle As Long,
+                                                                                              ByVal pos As Long,
+                                                                                              ByVal poshigh As Long,
+                                                                                              ByVal mode As Long) _
+        As Long
+    Public Function BASS_ChannelGetPosition(handle As Integer) As Long
+        Return BASS_ChannelGetPosition(handle, BASSMode.BASS_POS_BYTES)
+    End Function
+
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetPosition(handle As Integer, mode As BASSMode) As Long
+    End Function
+
+
+
     Declare Function BASS_ChannelGetLevel Lib "bass.dll" (ByVal handle As Long) As Long
-    Declare Function BASS_ChannelGetData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Object, ByVal length As Long) As Long
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetData(handle As Integer, buffer As IntPtr, length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetData(handle As Integer, <[In], Out> buffer As Byte(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetData(handle As Integer, <[In], Out> buffer As Short(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetData(handle As Integer, <[In], Out> buffer As Integer(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelGetData(handle As Integer, <[In], Out> buffer As Single(), length As Integer) As Integer
+    End Function
+
+
+
+
 
     ' Setup a sync on a channel. Multiple syncs may be used per channel.
     ' handle : Channel handle (currently there are only HMUSIC syncs)
@@ -786,7 +1019,12 @@ Public Module Bass
     ' proc   : User defined callback function (use AddressOf SYNCPROC)
     ' user   : The 'user' value passed to the callback function
     ' Return : Sync handle(Null = Error)
-    Declare Function BASS_ChannelSetSync Lib "bass.dll" (ByVal handle As Integer, ByVal atype As SetSyncSyncType, ByVal param As Long, ByVal proc As SYNCPROC_Handler, ByVal user As Integer) As Integer
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_ChannelSetSync(handle As Integer, type As SetSyncSyncType, param As Long, proc As Syncproc, user As IntPtr) As Integer
+    End Function
+#End Region
+
+
     '  Function BASS_ChannelSetSync(ByVal handle As Long, ByVal type_ As Long, ByVal param As Long, ByVal proc As Long, ByVal user As Long) As Long
     '  BASS_ChannelSetSync = BASS_ChannelSetSync(handle, type_, param, 0, proc, user)
     '   End Function
@@ -807,24 +1045,42 @@ Public Module Bass
         BASS_SYNC_DOWNLOAD = 7
     End Enum
 
+    Public Enum BASSStreamFilePosition
+        BASS_FILEPOS_CURRENT _
+        'Position that is to be decoded for playback next. This will be a bit ahead of the position actually being heard due to buffering.
+        BASS_FILEPOS_END _
+        'End of the file, in other words the file length. When streaming in blocks, the file length is unknown, so the download buffer length is returned instead.
+        BASS_FILEPOS_START  'Start of stream data in the file.
+        BASS_FILEPOS_DOWNLOAD   'Download progress of an internet file stream or "buffered" user file stream.
+        BASS_FILEPOS_CONNECTED _
+        'Internet file stream or "buffered" user file stream is still connected? 0 = no, 1 = yes.
+        BASS_FILEPOS_BUFFER _
+        'The amount of data in the buffer of an internet file stream or "buffered" user file stream. Unless streaming in blocks,this i
+    End Enum
 
-
-    ' Declare Function BASS_ChannelSetSync64 Lib "bass.dll" Alias "BASS_ChannelSetSync" (ByVal handle As Long, ByVal type_ As Long, ByVal param As Long, ByVal paramhigh As Long, ByVal proc As Long, ByVal user As Long) As Long
-    Declare Function BASS_ChannelRemoveSync Lib "bass.dll" (ByVal handle As Long, ByVal sync As Long) As Long
-    Declare Function BASS_ChannelSetDSP Lib "bass.dll" (ByVal handle As Long, ByVal proc As Long, ByVal user As Long, ByVal priority As Long) As Long
-    Declare Function BASS_ChannelRemoveDSP Lib "bass.dll" (ByVal handle As Long, ByVal dsp As Long) As Long
-    Declare Function BASS_ChannelSetLink Lib "bass.dll" (ByVal handle As Long, ByVal chan As Long) As Long
-    Declare Function BASS_ChannelRemoveLink Lib "bass.dll" (ByVal handle As Long, ByVal chan As Long) As Long
-    Declare Function BASS_ChannelSetFX Lib "bass.dll" (ByVal handle As Long, ByVal type_ As Long, ByVal priority As Long) As Long
-    Declare Function BASS_ChannelRemoveFX Lib "bass.dll" (ByVal handle As Long, ByVal fx As Long) As Long
-    Declare Function BASS_FXSetParameters Lib "bass.dll" (ByVal handle As Long, ByRef par As Object) As Long
-    Declare Function BASS_FXGetParameters Lib "bass.dll" (ByVal handle As Long, ByRef par As Object) As Long
-    Declare Function BASS_FXReset Lib "bass.dll" (ByVal handle As Long) As Long
-
-    Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (ByRef Destination As Object, ByRef Source As Object, ByVal length As Long)
+    Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (ByRef Destination As Object,
+                                                                        ByRef Source As Object, ByVal length As Long)
 
 
     Public Declare Function lstrlen Lib "kernel32" Alias "lstrlenA" (ByVal lpString As IntPtr) As Int32
+
+
+    <DllImport("bass.dll", EntryPoint:="BASS_StreamCreate", CharSet:=CharSet.Auto)> _
+    Private Function BASS_StreamCreatePtr(A_0 As Integer, A_1 As Integer, A_2 As BassFlag, A_3 As IntPtr, A_4 As IntPtr) As Integer
+    End Function
+    Public Function BASS_StreamCreatePush(freq As Integer, chans As Integer, flags As BassFlag, user As IntPtr) As Integer
+        Return BASS_StreamCreatePtr(freq, chans, flags, New IntPtr(-1), user)
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutData(handle As IntPtr, buffer As IntPtr, length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutData(handle As IntPtr, buffer As Byte(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutData(handle As IntPtr, buffer As Single(), length As Integer) As Integer
+    End Function
+
 
 
     Public Function BASS_SPEAKER_N(ByVal n As Long) As Long
@@ -832,17 +1088,16 @@ Public Module Bass
     End Function
 
     ' 32-bit wrappers for 64-bit BASS functions
-    Function BASS_MusicLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
+    Function BASS_MusicLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long,
+                            ByVal flags As Long, ByVal freq As Long) As Long
         BASS_MusicLoad = BASS_MusicLoad64(mem, file, offset, 0, length, flags Or BASS_UNICODE, freq)
     End Function
 
-    Function BASS_SampleLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
+    Function BASS_SampleLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long,
+                             ByVal max As Long, ByVal flags As Long) As Long
         BASS_SampleLoad = BASS_SampleLoad64(mem, file, offset, 0, length, max, flags Or BASS_UNICODE)
     End Function
 
-    Function BASS_StreamCreateFile(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long) As Long
-        BASS_StreamCreateFile = BASS_StreamCreateFile64(mem, file, offset, 0, length, 0, flags Or BASS_UNICODE)
-    End Function
 
     Function BASS_ChannelBytes2Seconds(ByVal handle As Long, ByVal pos As Long) As Double
         BASS_ChannelBytes2Seconds = BASS_ChannelBytes2Seconds64(handle, pos, 0)
@@ -852,190 +1107,18 @@ Public Module Bass
         BASS_ChannelSetPosition = BASS_ChannelSetPosition64(handle, pos, 0, mode)
     End Function
 
-
-
-    ' BASS_PluginGetInfo wrappers
-    Function BASS_PluginGetInfo(ByVal handle As Long) As BASS_PLUGININFO
-        Dim pinfo As BASS_PLUGININFO, plug As Long
-        plug = BASS_PluginGetInfo_(handle)
-        If plug Then
-            Call CopyMemory(pinfo, plug, Len(pinfo))
-        End If
-        BASS_PluginGetInfo = pinfo
-    End Function
-
-    Function BASS_PluginGetInfoFormat(ByVal handle As Long, ByVal index As Long) As BASS_PLUGINFORM
-        Dim pform As BASS_PLUGINFORM, plug As Long
-        plug = BASS_PluginGetInfo(handle).formats
-        If plug Then
-            plug = plug + (index * Len(pform))
-            Call CopyMemory(pform, plug, Len(pform))
-        End If
-        BASS_PluginGetInfoFormat = pform
-    End Function
-
-    ' callback functions
-    Function STREAMPROC(ByVal handle As Long, ByVal buffer As Long, ByVal length As Long, ByVal user As Long) As Long
-
-        'CALLBACK FUNCTION !!!
-
-        ' User stream callback function
-        ' NOTE: A stream function should obviously be as quick
-        ' as possible, other streams (and MOD musics) can't be mixed until it's finished.
-        ' handle : The stream that needs writing
-        ' buffer : Buffer to write the samples in
-        ' length : Number of bytes to write
-        ' user   : The 'user' parameter value given when calling BASS_StreamCreate
-        ' RETURN : Number of bytes written. Set the BASS_STREAMPROC_END flag to end
-        '          the stream.
-
-    End Function
-
-    Sub DOWNLOADPROC(ByVal buffer As Long, ByVal length As Long, ByVal user As Long)
-
-        'CALLBACK FUNCTION !!!
-
-        ' Internet stream download callback function.
-        ' buffer : Buffer containing the downloaded data... NULL=end of download
-        ' length : Number of bytes in the buffer
-        ' user   : The 'user' parameter given when calling BASS_StreamCreateURL
-
-    End Sub
-
-    Sub SYNCPROC(ByVal handle As Long, ByVal channel As Long, ByVal data As Long, ByVal user As Long)
-
-        'CALLBACK FUNCTION !!!
-
-        'Similarly in here, write what to do when sync function
-        'is called, i.e screen flash etc.
-
-        ' NOTE: a sync callback function should be very quick as other
-        ' syncs cannot be processed until it has finished.
-        ' handle : The sync that has occured
-        ' channel: Channel that the sync occured in
-        ' data   : Additional data associated with the sync's occurance
-        ' user   : The 'user' parameter given when calling BASS_ChannelSetSync */
-
-    End Sub
-
-    Sub DSPPROC(ByVal handle As Long, ByVal channel As Long, ByVal buffer As Long, ByVal length As Long, ByVal user As Long)
-
-        'CALLBACK FUNCTION !!!
-
-        ' VB doesn't support pointers, so you should copy the buffer into an array,
-        ' process it, and then copy it back into the buffer.
-
-        ' DSP callback function. NOTE: A DSP function should obviously be as quick as
-        ' possible... other DSP functions, streams and MOD musics can not be processed
-        ' until it's finished.
-        ' handle : The DSP handle
-        ' channel: Channel that the DSP is being applied to
-        ' buffer : Buffer to apply the DSP to
-        ' length : Number of bytes in the buffer
-        ' user   : The 'user' parameter given when calling BASS_ChannelSetDSP
-
-    End Sub
-
-    Function RECORDPROC(ByVal handle As Long, ByVal buffer As Long, ByVal length As Long, ByVal user As Long) As Long
-
-        'CALLBACK FUNCTION !!!
-
-        ' Recording callback function.
-        ' handle : The recording handle
-        ' buffer : Buffer containing the recorded samples
-        ' length : Number of bytes
-        ' user   : The 'user' parameter value given when calling BASS_RecordStart
-        ' RETURN : BASSTRUE = continue recording, BASSFALSE = stop
-
-    End Function
-
-    ' User file stream callback functions (BASS_FILEPROCS)
-    Sub FILECLOSEPROC(ByVal user As Long)
-
-    End Sub
-
-    Function FILELENPROC(ByVal user As Long) As String '  Currency ' ???
-
-    End Function
-
-    Function FILEREADPROC(ByVal buffer As Long, ByVal length As Long, ByVal user As Long) As Long
-
-    End Function
-
-    Function FILESEEKPROC(ByVal offset As Long, ByVal offsethigh As Long, ByVal user As Long) As Long
-
-    End Function
-
-
-    Function BASS_SetEAXPreset(ByVal preset) As Long
-        ' This function is a workaround, because VB doesn't support multiple comma seperated
-        ' paramaters for each Public Const, simply pass the EAX_ENVIRONMENT_xxx value to this function
-        ' instead of BASS_SetEAXParameters as you would do in C/C++
-        Select Case preset
-            Case EAX_ENVIRONMENT_GENERIC
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_GENERIC, 0.5, 1.493, 0.5)
-            Case EAX_ENVIRONMENT_PADDEDCELL
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_PADDEDCELL, 0.25, 0.1, 0)
-            Case EAX_ENVIRONMENT_ROOM
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_ROOM, 0.417, 0.4, 0.666)
-            Case EAX_ENVIRONMENT_BATHROOM
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_BATHROOM, 0.653, 1.499, 0.166)
-            Case EAX_ENVIRONMENT_LIVINGROOM
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_LIVINGROOM, 0.208, 0.478, 0)
-            Case EAX_ENVIRONMENT_STONEROOM
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_STONEROOM, 0.5, 2.309, 0.888)
-            Case EAX_ENVIRONMENT_AUDITORIUM
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_AUDITORIUM, 0.403, 4.279, 0.5)
-            Case EAX_ENVIRONMENT_CONCERTHALL
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_CONCERTHALL, 0.5, 3.961, 0.5)
-            Case EAX_ENVIRONMENT_CAVE
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_CAVE, 0.5, 2.886, 1.304)
-            Case EAX_ENVIRONMENT_ARENA
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_ARENA, 0.361, 7.284, 0.332)
-            Case EAX_ENVIRONMENT_HANGAR
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_HANGAR, 0.5, 10, 0.3)
-            Case EAX_ENVIRONMENT_CARPETEDHALLWAY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_CARPETEDHALLWAY, 0.153, 0.259, 2)
-            Case EAX_ENVIRONMENT_HALLWAY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_HALLWAY, 0.361, 1.493, 0)
-            Case EAX_ENVIRONMENT_STONECORRIDOR
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_STONECORRIDOR, 0.444, 2.697, 0.638)
-            Case EAX_ENVIRONMENT_ALLEY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_ALLEY, 0.25, 1.752, 0.776)
-            Case EAX_ENVIRONMENT_FOREST
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_FOREST, 0.111, 3.145, 0.472)
-            Case EAX_ENVIRONMENT_CITY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_CITY, 0.111, 2.767, 0.224)
-            Case EAX_ENVIRONMENT_MOUNTAINS
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_MOUNTAINS, 0.194, 7.841, 0.472)
-            Case EAX_ENVIRONMENT_QUARRY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_QUARRY, 1, 1.499, 0.5)
-            Case EAX_ENVIRONMENT_PLAIN
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_PLAIN, 0.097, 2.767, 0.224)
-            Case EAX_ENVIRONMENT_PARKINGLOT
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_PARKINGLOT, 0.208, 1.652, 1.5)
-            Case EAX_ENVIRONMENT_SEWERPIPE
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_SEWERPIPE, 0.652, 2.886, 0.25)
-            Case EAX_ENVIRONMENT_UNDERWATER
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_UNDERWATER, 1, 1.499, 0)
-            Case EAX_ENVIRONMENT_DRUGGED
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_DRUGGED, 0.875, 8.392, 1.388)
-            Case EAX_ENVIRONMENT_DIZZY
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_DIZZY, 0.139, 17.234, 0.666)
-            Case EAX_ENVIRONMENT_PSYCHOTIC
-                BASS_SetEAXPreset = BASS_SetEAXParameters(EAX_ENVIRONMENT_PSYCHOTIC, 0.486, 7.563, 0.806)
-        End Select
-    End Function
-
     Public Function LoByte(ByVal lparam As Long) As Long
         LoByte = lparam And &HFF&
     End Function
+
     Public Function HiByte(ByVal lparam As Long) As Long
         HiByte = (lparam And &HFF00&) / &H100&
     End Function
+
     Public Function LoWord(ByVal lparam As Long) As Long
         LoWord = lparam And &HFFFF&
     End Function
+
     Public Function HiWord(ByVal lparam As Long) As Long
         If lparam < 0 Then
             HiWord = (lparam \ &H10000 - 1) And &HFFFF&
@@ -1043,9 +1126,11 @@ Public Module Bass
             HiWord = lparam \ &H10000
         End If
     End Function
+
     Function MakeWord(ByVal LoByte As Long, ByVal HiByte As Long) As Long
         MakeWord = (LoByte And &HFF&) Or ((HiByte And &HFF&) * &H100&)
     End Function
+
     Function MakeLong(ByVal LoWord As Long, ByVal HiWord As Long) As Long
         MakeLong = LoWord And &HFFFF&
         HiWord = HiWord And &HFFFF&
@@ -1070,6 +1155,7 @@ Public Module Bass
             Return pointer
         End If
     End Function
+
     Public Function PointerToString(ByVal ptr As IntPtr) As [String]
         If ptr = IntPtr.Zero Then Return Nothing
         Dim encoding__1 As Encoding = Encoding.UTF8
@@ -1078,6 +1164,7 @@ Public Module Bass
         Marshal.Copy(ptr, bytes, 0, length)
         Return encoding__1.GetString(bytes, 0, length)
     End Function
+
     Public Function GetPointerLenght(ByVal ptr As IntPtr) As Integer
         If ptr = IntPtr.Zero Then Return 0
         Return lstrlen(ptr)
@@ -1086,30 +1173,19 @@ Public Module Bass
     Public Declare Function VarPtrAny Lib "vb40032.dll" Alias "VarPtr" (ByVal lpObject As Object) As Long
 
 
-    <DllImport("kernel32")> _
+    <DllImport("kernel32")>
     Public Function GetProcessHeap() As IntPtr
     End Function
 
-    <DllImport("kernel32")> _
+    <DllImport("kernel32")>
     Public Function HeapAlloc(ByVal heap As IntPtr, ByVal flags As UInt32, ByVal bytes As UInt32) As IntPtr
     End Function
 
 
 #Region " BASS Callback Delegate Functions "
+    Public Delegate Sub Syncproc(handle As Integer, channel As Integer, data As Integer, user As IntPtr)
+    Public Delegate Sub Downloadproc(buffer As IntPtr, length As Integer, user As IntPtr)
 
-    Public Delegate Function STREAMFILEPROC_Handler(ByVal action As Integer, ByVal param1 As Integer, ByVal param2 As Integer, ByVal user As Integer) As Integer
-
-    Public Delegate Function STREAMPROC_Handler(ByVal handle As Integer, ByVal buffer As Integer, ByVal length As Integer, ByVal user As Integer) As Integer
-
-    Public Delegate Sub SYNCPROC_Handler(ByVal handle As Integer, ByVal data As Integer, ByVal user As Integer)
-
-    Public Delegate Sub DSPPROC_Handler(ByVal handle As Integer, ByVal buffer As Integer, ByVal length As Integer, ByVal user As Integer)
-
-    Public Delegate Function RECORDPROC_Handler(ByVal buffer As Integer, ByVal length As Integer, ByVal user As Integer) As Integer
-
-    Public Delegate Sub DOWNLOADPROC_Handler(ByVal buffer As IntPtr, ByVal length As Integer, ByVal user As Integer)
 
 #End Region
-
-
 End Module

@@ -5,24 +5,39 @@
     Private Const FILE_ATTRIBUTE_NORMAL = &H80
     Private Const CREATE_ALWAYS = 2
     Private Const OPEN_ALWAYS = 4
-    Private Const INVALID_HANDLE_VALUE = -1
+    Private Const INVALID_HANDLE_VALUE = - 1
 
-    Private Declare Function MessageBox Lib "user32" Alias "MessageBoxA" (ByVal hwnd As Long, ByVal lpText As String, ByVal lpCaption As String, ByVal wType As Long) As Long
-    Private Declare Function ReadFile Lib "kernel32" (ByVal hFile As Long, ByVal lpBuffer As Object, ByVal nNumberOfBytesToRead As Long, ByVal lpNumberOfBytesRead As Long, ByVal lpOverlapped As Long) As Long
-    Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
-    Private Declare Function WriteFile Lib "kernel32" (ByVal hFile As Long, ByVal lpBuffer As Object, ByVal nNumberOfBytesToWrite As Long, ByVal lpNumberOfBytesWritten As Long, ByVal lpOverlapped As Long) As Long
-    Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileA" (ByVal lpFileName As String, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByVal lpSecurityAttributes As Long, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
-    Private Declare Function FlushFileBuffers Lib "kernel32" (ByVal hFile As Long) As Long
-    Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (ByVal Destination As Object, ByVal Source As Object, ByVal length As Long)
+    Private Declare Function MessageBox Lib "user32" Alias "MessageBoxA"(ByVal hwnd As Long, ByVal lpText As String,
+                                                                         ByVal lpCaption As String, ByVal wType As Long) _
+        As Long
+    Private Declare Function ReadFile Lib "kernel32"(ByVal hFile As Long, ByVal lpBuffer As Object,
+                                                     ByVal nNumberOfBytesToRead As Long,
+                                                     ByVal lpNumberOfBytesRead As Long, ByVal lpOverlapped As Long) _
+        As Long
+    Private Declare Function CloseHandle Lib "kernel32"(ByVal hObject As Long) As Long
+    Private Declare Function WriteFile Lib "kernel32"(ByVal hFile As Long, ByVal lpBuffer As Object,
+                                                      ByVal nNumberOfBytesToWrite As Long,
+                                                      ByVal lpNumberOfBytesWritten As Long, ByVal lpOverlapped As Long) _
+        As Long
+    Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileA"(ByVal lpFileName As String,
+                                                                           ByVal dwDesiredAccess As Long,
+                                                                           ByVal dwShareMode As Long,
+                                                                           ByVal lpSecurityAttributes As Long,
+                                                                           ByVal dwCreationDisposition As Long,
+                                                                           ByVal dwFlagsAndAttributes As Long,
+                                                                           ByVal hTemplateFile As Long) As Long
+    Private Declare Function FlushFileBuffers Lib "kernel32"(ByVal hFile As Long) As Long
+    Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory"(ByVal Destination As Object,
+                                                                        ByVal Source As Object, ByVal length As Long)
 
     Private fHandle As Long
     Private fSuccess As Long
     Private lFilePos As Long
     Private File_Name As String
-    Public CLNTRadio As BSRDPlay
+    Public CLNTRadio As RadioPlayer
 
 
-    Public Sub New(ByRef caller As BSRDPlay)
+    Public Sub New(ByRef caller As RadioPlayer)
         Me.CLNTRadio = caller
     End Sub
 
@@ -86,10 +101,5 @@
             WriteBytes = False
             Exit Function
         End If
-
     End Function
-
-
-
-
 End Class

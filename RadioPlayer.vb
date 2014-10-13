@@ -1,9 +1,8 @@
-﻿Imports System.Threading
-Imports RadioPlayer.Extensions
+﻿Imports System.IO
+Imports System.Net
 
 
 Public Class RadioPlayer
-
     Public Property Text As String
     Public Property LblName As String
     Public Property LblSong As String
@@ -11,6 +10,7 @@ Public Class RadioPlayer
     Public Property Upd As UpInfo
 
 #Region "Info"
+
     Public Property Receiver As AudioReceiver
 
     Public Property Channel As Long
@@ -20,13 +20,14 @@ Public Class RadioPlayer
     Public Property TmpNameHold2 As String
 
     ' SAVE LOCAL COPY
-    Public WriteFile As New clsFileIo(Me)
+    'Public WriteFile As New clsFileIo(Me)
 
     Public FileIsOpen As Boolean
     Public DownloadStarted As Boolean
     ' DoDownload As Boolean
     Public DlOutput As String
     Dim SongNameUpdate As Boolean
+
 #End Region
 
 
@@ -37,12 +38,13 @@ Public Class RadioPlayer
     End Sub
 
 #Region "Construction"
-    Public Sub New(ByRef up As UpInfo, _
-                    url As String)
+
+    Public Sub New(ByRef up As UpInfo,
+                   url As String)
         Me.Upd = up
         Me.Url = url
-        WriteFile = New clsFileIo(Me)
     End Sub
+
 #End Region
 
     Public Sub Play()
@@ -68,14 +70,13 @@ Public Class RadioPlayer
     End Sub
 
     Public Sub Clear()
-
     End Sub
 
-    
+
     Public Sub SetPict(url As String)
         Try
-            Dim ms As IO.MemoryStream = New IO.MemoryStream(New Net.WebClient().DownloadData(url))
-            Dim img As Drawing.Image = Drawing.Image.FromStream(ms)
+            Dim ms As MemoryStream = New MemoryStream(New WebClient().DownloadData(url))
+            Dim img As Image = Image.FromStream(ms)
             ms.Close()
             Me.PictBx = img
             ' Me.pictBx.SizeMode = PictureBoxSizeMode.StretchImage
@@ -83,5 +84,4 @@ Public Class RadioPlayer
 
         End Try
     End Sub
-
 End Class

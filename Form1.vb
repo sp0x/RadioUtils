@@ -1,49 +1,36 @@
-﻿Imports RadioPlayer.Bass
-Imports System.Threading
+﻿Imports System.Threading
 
 
 Public Class Form1
-   Public BSRDPLS() As RadioPlayer
-
-#Region "Initiation and config"
-
-    Public Sub ConfigSound()
-        Call BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1) ' enable playlist processing
-        Call BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0) ' minimize automatic pre-buffering, so we can do it (and display it) instead
-        Call BASS_SetConfigPtr(BASS_CONFIG_NET_PROXY, 0)  ' setup proxy server location
-        '    Call BASS_SetConfigPtr(BASS_CONFIG_NET_PROXY, 0)  ' setup proxy server location
-    End Sub
-
-    Public Function InitBASS()
-        Dim bv As Long = HiWord(BASS_GetVersion)
-        If bv <> BASSVERSION Then MsgBox("INVALID BASS.DLL VERSION!", MsgBoxStyle.Critical, "ERROR!") : Return False
-        Dim init As Long = BASS_Init(-1, 44100, 0, Me.Handle, 0)
-        If init = 0 Then MsgBox("Can't initialize device") : Return False
-        Return True
-    End Function
-
-#End Region
-
-
-    Public Sub ld() Handles Me.Load
-        If Not InitBASS() Then Return
-        ConfigSound()
+    Public Property BSRDPLS() As RadioPlayer
+    Public Property Stream As ShoutcastStream
+    Public Property StreamPlayer As StreamPlayer
+    
+    Public Sub Loaded() Handles Me.Load
         TextBox1.Text = "http://www.radioparadise.com/musiclinks/rp_128-9.m3u"
-    End Sub
+      End Sub
 
-    Public Declare Ansi Function BASS_SetVolume Lib "bass.dll" (ByVal vol As Single) As BassBool
+    
+
     Public Sub CHNGVol(ByVal sender As Object, ByVal e As EventArgs) Handles TrackBar1.ValueChanged
-        Dim vol As Double = TrackBar1.Value / 100
-        Dim reps As BassBool = Me.BASS_SetVolume(vol)
+        Dim vol As Double = TrackBar1.Value/100
+        BASS_SetVolume(vol)
         Dim err As Int64 = BASS_ErrorGetCode
         err = err
     End Sub
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
-        Dim bs As New RadioPlayer(New RadioPlayer.UpInfo(AddressOf UpdateSongInfo), Me.TextBox1.Text)
 
-        'Me.Url = TextBox1.Text
-        Dim th As New Threading.Thread(AddressOf bs.LoadRadioTHR) With {.IsBackground = True}
-        th.Start()
+    Private Sub Button2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BtnPlay.Click
+        Try
+            Stream = New ShoutcastStream(TextBox1.Text)
+            StreamPlayer = New StreamPlayer(Stream)
+            StreamPlayer.PlayThreaded()
+            'Dim bs As New RadioPlayer(New RadioPlayer.UpInfo(AddressOf UpdateSongInfo), Me.TextBox1.Text)
+            ''Me.Url = TextBox1.Text
+            'Dim th As New Thread(AddressOf bs.Play) With {.IsBackground = True}
+            'th.Start()
+        Catch ex As Exception
+            ex = ex
+        End Try
     End Sub
 
     Public Sub UpdateSongInfo(ByVal txt As String, ByVal name As String, ByVal sngname As String, ByVal px As Image)
@@ -57,18 +44,4 @@ Public Class Form1
         End If
     End Sub
 
-
-
-
-    Public Class AIRadio
-
-
-
     End Class
-
-
-    
-    Private Sub TrackBar1_Scroll(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TrackBar1.Scroll
-
-    End Sub
-End Class
