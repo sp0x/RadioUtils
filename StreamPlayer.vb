@@ -7,10 +7,11 @@ Public Class StreamPlayer
     Implements IDisposable
 
     Public Property Thread As System.Threading.Thread
-    Public Property Handle() As IntPtr Implements IStreamPlayer.Handle
+    Public Property PlaybackStream() As IntPtr Implements IStreamPlayer.PlaybackStream
     Public Property BaseStream As Stream Implements IStreamPlayer.BaseStream
     Public Property AudioBuffer As Byte() = New Byte(1024 * 100) {}
     Public Property BufferHandle As IntPtr
+    Public Property Position As Int32
 
 #Region "Construction"
     Public Sub New(stream As Stream)
@@ -30,49 +31,68 @@ Public Class StreamPlayer
     Private Function InitBass() As Boolean
         Dim bv As Long = HiWord(BASS_GetVersion())
         If bv <> BASSVERSION Then MsgBox("INVALID BASS.DLL VERSION!", MsgBoxStyle.Critical, "ERROR!") : Return False
-        Dim init As Long = BASS_Init(-1, 44100, 0, Me.Handle, Nothing)
+        Dim init As Long = BASS_Init(-1, 44100, BASSInit.BassDevice_8Bits, IntPtr.Zero, Nothing)
+
         If init = 0 Then MsgBox("Can't initialize device") : Return False
         ConfigSound()
-       Return True
+        Return True
     End Function
 #End Region
 
     Public Function Initialize() As Boolean
         InitBass()
-        Dim gch = GCHandle.Alloc(AudioBuffer, GCHandleType.Pinned)
-        BufferHandle = gch.AddrOfPinnedObject()
-        Handle = BASS_StreamCreatePush(44100, 2, BASS_STREAM_BLOCK Or BASS_STREAM_STATUS Or BASS_STREAM_AUTOFREE, 0)
-        
-        If Handle = IntPtr.Zero Then
-            Handle = BASS_ErrorGetCode
-            Dim err As BassError = Handle
+        PlaybackStream = BASS_StreamCreatePush(44100, 1, BassFlag.BassDefault, Nothing)
+
+        If PlaybackStream = IntPtr.Zero Then
+            PlaybackStream = BASS_ErrorGetCode
+            Dim err As BassError = PlaybackStream
             Throw New Exception("Bass: " & err.ToString)
         End If
-        Return Not Handle = IntPtr.Zero
+        Return Not PlaybackStream = IntPtr.Zero
+    End Function
+    Private totalQueued As Int32 = 0
+    Private Sub _pushBuffer(pBuffer As Byte(), Optional len As Int32 = 0)
+        If pBuffer.Length = 0 Then Return
+        Dim dataplaced = Bass.BASS_StreamPutData(PlaybackStream, pBuffer, len / 8)
+    End Sub
+
+
+    '''/* get size of a buffer to hold nSamples */
+    Public Shared Function samplesToBytes(nSamples As Int32, sampleSizeBits As Int32) As Int32
+        Return nSamples * (sampleSizeBits / 8)
     End Function
 
 
+
+    Private Sub _playPlayback()
+        Dim pflag As Boolean = Bass.BASS_ChannelPlay(PlaybackStream, False)
+        If pflag Then
+            ' playing...
+        Else
+            Trace.WriteLine(String.Format("Err= {0}", Bass.BASS_ErrorGetCode()))
+        End If
+    End Sub
+
     Public Sub Play() Implements IStreamPlayer.Play
         Dim buff As Byte() = New Byte(1024 * 100 * 1) {}
-        If Handle = IntPtr.Zero Then
+        If PlaybackStream = IntPtr.Zero Then
             If Not Initialize() Then
                 Throw New InvalidOperationException
             End If
         End If
         Do While BaseStream.CanRead
             Dim nRead As Int32 = BaseStream.Read(buff, 0, buff.Length)
-            If nRead = 0 Then Exit Do
-            Dim pg As IntPtr = BASS_StreamPutData(Handle, buff, nRead)
-            Dim pFlag As Int32 = 0
-            pFlag = Bass.BASS_ChannelPlay(Handle, False)
-            '   pg = BASS_ChannelGetData(Handle, buff, 0)
-            'pg = BASS_ChannelGetPosition(Handle)
+            Position += nRead
+            ' Trace.WriteLine(String.Format("Red {0} bytes", nRead))
+            'If nRead = 0 Then Exit Do
+            _pushBuffer(buff, nRead)
+            _playPlayback()
 
-            If pFlag > -1 Then
-                ' playing...
-            Else
-                '  Trace.WriteLine(String.Format("Err= {0}", Bass.BASS_ErrorGetCode()))
-            End If
+            'If pFlag > -1 Then
+            '    ' playing...
+            'Else
+            '    '  Trace.WriteLine(String.Format("Err= {0}", Bass.BASS_ErrorGetCode()))
+            'End If
             '  Marshal.FreeHGlobal(lpBuff) ' ;//release memory from heap
         Loop
     End Sub
@@ -83,9 +103,9 @@ Public Class StreamPlayer
     End Sub
 
     Public Function [Stop]() As Boolean Implements IStreamPlayer.[Stop]
-        Return Bass.BASS_ChannelStop(Handle)
+        Return Bass.BASS_ChannelStop(PlaybackStream)
     End Function
-    
+
     Public Sub PlayThreaded() Implements IStreamPlayer.PlayThreaded
         If Thread Is Nothing Then
             Thread = New System.Threading.Thread(AddressOf Play)
@@ -98,8 +118,8 @@ Public Class StreamPlayer
     End Sub
 
     Public Sub Dispose() Implements IDisposable.Dispose
-        If Not Handle = IntPtr.Zero Then
-            BASS_StreamFree(Handle)
+        If Not PlaybackStream = IntPtr.Zero Then
+            BASS_StreamFree(PlaybackStream)
         End If
     End Sub
 End Class

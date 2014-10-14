@@ -18,6 +18,8 @@ End Enum
 ''' </summary>
 Public Class ShoutcastStream
     Inherits Stream
+    Implements IAudioStream
+
 #Region "Variables"
     Private blockSize As Integer
     Private receivedBytes As Integer
@@ -27,6 +29,7 @@ Public Class ShoutcastStream
     Private _strCoverUrl As String
     Public Property Type As StreamType = StreamType.Mpeg
     Public Property ServerList As List(Of String)
+    Public Property Bitrate() As Integer Implements IAudioStream.Bitrate
 #End Region
 
 
@@ -83,8 +86,11 @@ Public Class ShoutcastStream
             If SourceAddress IsNot Nothing Then netStream = OpenMediaLink(SourceAddress, resp)
             If resp.Headers.AllKeys.Contains("icy-metaint") Then
                 blockSize = Integer.Parse(resp.Headers("icy-metaint"))
+                Integer.TryParse(resp.Headers("icy-br"), Bitrate)
                 Type = StreamType.Shoutcast
+
             End If
+
         Else
             blockSize = Integer.Parse(resp.Headers("icy-metaint"))
             Type = StreamType.Shoutcast
@@ -294,5 +300,6 @@ Public Class ShoutcastStream
         netStream.Close()
     End Sub
 #End Region
+
 
 End Class

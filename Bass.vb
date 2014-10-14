@@ -22,46 +22,7 @@ Public Module Bass
     Public Const BASSTRUE As Long = 1   'Use this instead of VB Booleans
     Public Const BASSFALSE As Long = 0  'Use this instead of VB Booleans
 
-    Public Enum BassError
-        'Error codes returned by BASS_ErrorGetCode
-        OK = 0               'all is OK
-        MEM = 1        'memory error
-        FILEOPEN = 2   'can't open the file
-        DRIVER = 3     'can't find a free sound driver
-        BUFLOST = 4    'the sample buffer was lost
-        HANDLE = 5     'invalid handle
-        FORMAT = 6     'unsupported sample format
-        POSITION = 7   'invalid position
-        INIT = 8       'BASS_Init has not been successfully called
-        START = 9      'BASS_Start has not been successfully called
-        ALREADY = 14   'already initialized/paused/whatever
-        NOCHAN = 18    'can't get a free channel
-        ILLtype = 19   'an illegalPublic Structure was specified
-        ILLPARAM = 20  'an illegal parameter was specified
-        NO3D = 21      'no 3D support
-        NOEAX = 22     'no EAX support
-        DEVICE = 23    'illegal device number
-        NOPLAY = 24    'not playing
-        FREQ = 25      'illegal sample rate
-        NOTFILE = 27   'the stream is not a file stream
-        NOHW = 29      'no hardware voices available
-        EMPTY = 31     'the MOD music has no sequence data
-        NONET = 32     'no internet connection could be opened
-        CREATE = 33    'couldn't create the file
-        NOFX = 34      'effects are not available
-        NOTAVAIL = 37  'requested data is not available
-        DECODE = 38    'the channel is a "decoding channel"
-        DX = 39        'a sufficient DirectX version is not installed
-        TIMEOUT = 40   'connection timedout
-        FILEFORM = 41  'unsupported file format
-        SPEAKER = 42   'unavailable speaker
-        VERSION = 43   'invalid BASS version (used by add-ons)
-        CODEC = 44     'codec is not available/supported
-        ENDED = 45     'the channel/file has ended
-        BUSY = 46      'the device is busy
-        UNKNOWN = -1   'some other mystery problem
-    End Enum
-
+  
     ' BASS_SetConfig options
     Public Const BASS_CONFIG_BUFFER = 0
     Public Const BASS_CONFIG_UPDATEPERIOD = 1
@@ -353,7 +314,7 @@ Public Module Bass
 
     ' special STREAMPROCs
     Public Const STREAMPROC_DUMMY = 0 ' "dummy" stream
-    Public Const STREAMPROC_PUSH = - 1 ' push stream
+    Public Const STREAMPROC_PUSH = -1 ' push stream
 
     ' BASS_StreamCreateFileUser file systems
     Public Const STREAMFILE_NOBUFFER = 0
@@ -710,10 +671,10 @@ Public Module Bass
 
 
     ' Retrieve the version number of BASS that is loaded. RETURN : The BASS version (LOWORD.HIWORD)
-    Declare Function BASS_GetVersion Lib "bass.dll"() As Integer
-    
+    Declare Function BASS_GetVersion Lib "bass.dll" () As Integer
 
-    Declare Function BASS_ErrorGetCode Lib "bass.dll"() As Int32
+
+    Declare Function BASS_ErrorGetCode Lib "bass.dll" () As BassError
     '  Declare Function BASS_GetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) As IntPtr
 
 #Region "Bass Init"
@@ -827,7 +788,7 @@ Public Module Bass
     Declare Function BASS_SampleStop Lib "bass.dll" (ByVal handle As Long) As Long
 
     Public Function BASS_StreamCreate(freq As Integer, chans As Integer, flags As BassFlag, proc As IntPtr) As Integer
-        Return BASS_StreamCreatePtr(freq, chans, flags, New IntPtr(CInt(proc)), IntPtr.Zero)
+        Return BASS_StreamCreate(freq, chans, flags, New IntPtr(CInt(proc)), IntPtr.Zero)
     End Function
 
 
@@ -868,7 +829,7 @@ Public Module Bass
     ' flags  : Flags
     ' proc   : The callback function. Use AddressOf
     ' user   : The 'user' value passed to the callback function
-    ' RETURN : The created stream's handle (NULL=error)
+    ' RETURN : The created stream's PlaybackStream (NULL=error)
     Public Function BASS_StreamCreateURL(url As String, offset As Integer, flags As BASSFlag, proc As DOWNLOADPROC, user As IntPtr) As Integer
         flags = flags Or BASSFlag.BassDefault Or BASSFlag.BASS_UNICODE
         Dim num As Integer = BASS_StreamCreateURLUnicode(url, offset, flags, proc, user)
@@ -898,7 +859,7 @@ Public Module Bass
     Declare Function BASS_StreamFree Lib "bass.dll" (ByVal handle As IntPtr) As Long
     Declare Function BASS_StreamGetFilePosition Lib "bass.dll" (ByVal handle As IntPtr,
                                                                ByVal mode As BASSStreamFilePosition) As Long
-   
+
     Declare Function BASS_RecordGetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) _
         As Long
     Declare Function BASS_RecordInit Lib "bass.dll" (ByVal device As Long) As Long
@@ -1013,20 +974,20 @@ Public Module Bass
 
 
     ' Setup a sync on a channel. Multiple syncs may be used per channel.
-    ' handle : Channel handle (currently there are only HMUSIC syncs)
+    ' PlaybackStream : Channel PlaybackStream (currently there are only HMUSIC syncs)
     ' atype  : Sync type (BASS_SYNC_xxx type & flags)
     ' param  : Sync parameters (see the BASS_SYNC_xxx type description)
     ' proc   : User defined callback function (use AddressOf SYNCPROC)
     ' user   : The 'user' value passed to the callback function
-    ' Return : Sync handle(Null = Error)
+    ' Return : Sync PlaybackStream(Null = Error)
     <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
     Public Function BASS_ChannelSetSync(handle As Integer, type As SetSyncSyncType, param As Long, proc As Syncproc, user As IntPtr) As Integer
     End Function
 #End Region
 
 
-    '  Function BASS_ChannelSetSync(ByVal handle As Long, ByVal type_ As Long, ByVal param As Long, ByVal proc As Long, ByVal user As Long) As Long
-    '  BASS_ChannelSetSync = BASS_ChannelSetSync(handle, type_, param, 0, proc, user)
+    '  Function BASS_ChannelSetSync(ByVal PlaybackStream As Long, ByVal type_ As Long, ByVal param As Long, ByVal proc As Long, ByVal user As Long) As Long
+    '  BASS_ChannelSetSync = BASS_ChannelSetSync(PlaybackStream, type_, param, 0, proc, user)
     '   End Function
     Public Enum SetSyncSyncType As Integer
         BASS_SYNC_MESSAGE = &H20000000
@@ -1066,11 +1027,14 @@ Public Module Bass
 
 
     <DllImport("bass.dll", EntryPoint:="BASS_StreamCreate", CharSet:=CharSet.Auto)> _
-    Private Function BASS_StreamCreatePtr(A_0 As Integer, A_1 As Integer, A_2 As BassFlag, A_3 As IntPtr, A_4 As IntPtr) As Integer
+    Private Function BASS_StreamCreate(freq As Int32, chans As Int32, flags As BassFlag, proc As IntPtr, user As IntPtr) As Integer
     End Function
-    Public Function BASS_StreamCreatePush(freq As Integer, chans As Integer, flags As BassFlag, user As IntPtr) As Integer
-        Return BASS_StreamCreatePtr(freq, chans, flags, New IntPtr(-1), user)
+    Public Function BASS_StreamCreatePush(freq As Integer, chans As Integer, flags As BassFlag, user As STREAMPROC) As Integer
+        Dim lp As IntPtr = IntPtr.Zero
+        If user IsNot Nothing Then lp = Marshal.GetFunctionPointerForDelegate(Of STREAMPROC)(user)
+        Return BASS_StreamCreate(freq, chans, flags, New IntPtr(-1), lp)
     End Function
+
     <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
     Public Function BASS_StreamPutData(handle As IntPtr, buffer As IntPtr, length As Integer) As Integer
     End Function
@@ -1078,7 +1042,26 @@ Public Module Bass
     Public Function BASS_StreamPutData(handle As IntPtr, buffer As Byte(), length As Integer) As Integer
     End Function
     <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutData(handle As IntPtr, buffer As Int32(), length As Integer) As Integer
+    End Function
+    'Public Function Bass_StreamPutData(handle As IntPtr, buffer As Byte(), len As Int32) As Int32
+    '    ReDim Preserve buffer(len - 1)
+    '    Dim lpBuff As IntPtr = ToPtr(buffer)
+    '    Dim result As Int32 = Bass_StreamPutData(handle, lpBuff, len)
+    '    Return result
+    'End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
     Public Function BASS_StreamPutData(handle As IntPtr, buffer As Single(), length As Integer) As Integer
+    End Function
+    Public Function ToPtr(ByVal data As Object) As Int32
+        Dim h As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
+        Dim ptr As IntPtr
+        Try
+            ptr = h.AddrOfPinnedObject()
+        Finally
+            If h.IsAllocated() Then h.Free()
+        End Try
+        Return ptr
     End Function
 
 
@@ -1185,7 +1168,7 @@ Public Module Bass
 #Region " BASS Callback Delegate Functions "
     Public Delegate Sub Syncproc(handle As Integer, channel As Integer, data As Integer, user As IntPtr)
     Public Delegate Sub Downloadproc(buffer As IntPtr, length As Integer, user As IntPtr)
-
+    Public Delegate Function STREAMPROC(handle As IntPtr, buffer As IntPtr, length As Int32, user As IntPtr) As Int32
 
 #End Region
 End Module

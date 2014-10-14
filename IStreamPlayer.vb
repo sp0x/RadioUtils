@@ -4,6 +4,6 @@ Public Interface IStreamPlayer
     Sub Play()
     Function [Stop]() As Boolean
     Sub PlayThreaded()
-    Property Handle As IntPtr
+    Property PlaybackStream As IntPtr
     Property BaseStream As Stream
 End Interface

@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="AudioReceiver.vb" />
     <Compile Include="Bass.vb" />
+    <Compile Include="BASSError.vb" />
     <Compile Include="BASSFlag.vb" />
     <Compile Include="BASSTag.vb" />
     <Compile Include="clsFileIo.vb" />
@@ -88,6 +89,7 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="IAudioStream.vb" />
     <Compile Include="IStreamPlayer.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
