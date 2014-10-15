@@ -6,12 +6,15 @@ Public Class StreamPlayer
     Implements IStreamPlayer
     Implements IDisposable
 
+#Region "Variables"
+
     Public Property Thread As System.Threading.Thread
     Public Property PlaybackStream() As IntPtr Implements IStreamPlayer.PlaybackStream
     Public Property BaseStream As Stream Implements IStreamPlayer.BaseStream
     Public Property AudioBuffer As Byte() = New Byte(1024 * 100) {}
     Public Property BufferHandle As IntPtr
     Public Property Position As Int32
+#End Region
 
 #Region "Construction"
     Public Sub New(stream As Stream)
@@ -19,34 +22,27 @@ Public Class StreamPlayer
     End Sub
 #End Region
 
+#Region "Events"
+    Public Event StatusUpdated(perc As Double, type As StatusType)
+
+#End Region
 
 #Region "Initiation and config"
 
     Private Sub ConfigSound()
-        Call BASS_SetConfig(BASSConfig.BASS_CONFIG_NET_PLAYLIST, 1) ' enable playlist processing
-        Call BASS_SetConfig(BASSConfig.BASS_CONFIG_NET_PREBUF, 0) _
+        'Call BASS_SetConfig(BASSConfig.BASS_CONFIG_NET_PLAYLIST, 1) ' enable playlist processing
+        'Call BASS_SetConfig(BASSConfig.BASS_CONFIG_NET_PREBUF, 0) _
         ' minimize automatic pre-buffering, so we can do it (and display it) instead
     End Sub
 
     Private Function InitBass() As Boolean
         Dim bv As Long = HiWord(BASS_GetVersion())
         If bv <> BASSVERSION Then MsgBox("INVALID BASS.DLL VERSION!", MsgBoxStyle.Critical, "ERROR!") : Return False
-        Dim init As Long = BASS_Init(-1, 44100, BASSInit.BassDevice_8Bits, IntPtr.Zero, Nothing)
+        Dim init As Long = BASS_Init(-1, 44100, BASSInit.BassDevice_8Bits, 0, Nothing)
 
         If init = 0 Then MsgBox("Can't initialize device") : Return False
         ConfigSound()
         Return True
-    End Function
-#End Region
-
-    Private Function ExecuteAudioStream(buffer As IntPtr, length As Integer, user As IntPtr) As Int32
-        Dim nRead As Int32
-        If BaseStream IsNot Nothing AndAlso BaseStream.CanRead Then
-            nRead = BaseStream.Read(AudioBuffer, 0, length)
-            Position += nRead
-        End If
-        If nRead > 0 Then Marshal.Copy(AudioBuffer, 0, buffer, nRead)
-        Return nRead
     End Function
 
     Public Function Initialize() As Boolean
@@ -64,18 +60,33 @@ Public Class StreamPlayer
         End If
         Return Not PlaybackStream = IntPtr.Zero
     End Function
+#End Region
 
+#Region "Stream output"
 
-
-    Private Sub DoPlayback()
-        Dim pflag As Boolean = Bass.BASS_ChannelPlay(PlaybackStream, False)
-        If pflag Then
-            ' playing...
-        Else
-            Trace.WriteLine(String.Format("PlayErr= {0}", Bass.BASS_ErrorGetCode()))
+    Private Function ExecuteAudioStream(buffer As IntPtr, length As Integer, user As IntPtr) As Int32
+        Dim nRead As Int32
+        If BaseStream Is Nothing Then
+            Return 0
         End If
-    End Sub
+        If buffer = IntPtr.Zero Then
+            Return 0
+        End If
 
+        If BaseStream IsNot Nothing AndAlso BaseStream.CanRead Then
+            nRead = BaseStream.Read(AudioBuffer, 0, length)
+            Position += nRead
+        End If
+        If nRead > 0 Then
+            Marshal.Copy(AudioBuffer, 0, buffer, nRead)
+        End If
+        Return nRead
+    End Function
+
+#End Region
+
+
+#Region "Playback"
     Public Sub Play() Implements IStreamPlayer.Play
         Dim buff As Byte() = New Byte(1024 * 100 * 1) {}
         If PlaybackStream = IntPtr.Zero Then
@@ -84,31 +95,18 @@ Public Class StreamPlayer
             End If
         End If
         Do While BaseStream.CanRead
-            ' ''Dim nRead As Int32 = BaseStream.Read(buff, 0, buff.Length)
-            ' ''Position += nRead
-            ' Trace.WriteLine(String.Format("Red {0} bytes", nRead))
-            'If nRead = 0 Then Exit Do
-            '   _pushBuffer(buff, nRead)
-            '    _playPlayback()
-
-            'If pFlag > -1 Then
-            '    ' playing...
-            'Else
-            '    '  Trace.WriteLine(String.Format("Err= {0}", Bass.BASS_ErrorGetCode()))
-            'End If
-            '  Marshal.FreeHGlobal(lpBuff) ' ;//release memory from heap
+            Dim prcComplete As Double = 0D
+            Dim pos As Long = BASS_StreamGetFilePosition(PlaybackStream, BASS_FILEPOS_END)
+            Try
+                prcComplete = BASS_StreamGetFilePosition(PlaybackStream, BASS_FILEPOS_BUFFER) * 100 / pos
+                playStream(prcComplete)
+            Catch EX As Exception
+                Trace.WriteLine(EX.Message)
+            End Try
         Loop
+
+
     End Sub
-
-    Private Sub DupDSP(handle As IntPtr, channel As Integer,
-                   buffer As IntPtr, length As Integer, user As IntPtr)
-        Bass.BASS_StreamPutData(user.ToInt32(), buffer, length)
-    End Sub
-
-    Public Function [Stop]() As Boolean Implements IStreamPlayer.[Stop]
-        Return Bass.BASS_ChannelStop(PlaybackStream)
-    End Function
-
     Public Sub PlayThreaded() Implements IStreamPlayer.PlayThreaded
         If Thread Is Nothing Then
             Thread = New System.Threading.Thread(AddressOf Play)
@@ -119,10 +117,32 @@ Public Class StreamPlayer
             End If
         End If
     End Sub
+    Public Function [Stop]() As Boolean Implements IStreamPlayer.[Stop]
+        Return Bass.BASS_ChannelStop(PlaybackStream)
+    End Function
 
+
+
+    Private Sub playStream(bufferLoadPercentage As Double)
+        Dim posConnected As Long = BASS_StreamGetFilePosition(PlaybackStream, BASS_FILEPOS_CONNECTED)
+        If (bufferLoadPercentage >= 75 Or posConnected = 0) Then
+            BASS_ChannelPlay(PlaybackStream, False)
+        Else
+            RaiseEvent StatusUpdated(bufferLoadPercentage, StatusType.Buffering)
+            '  Trace.WriteLine("buffering... " & bufferLoadPercentage.ToString() & "%")
+        End If
+    End Sub
+
+#End Region
+
+    
+    #Region "Disposing"
     Public Sub Dispose() Implements IDisposable.Dispose
         If Not PlaybackStream = IntPtr.Zero Then
             BASS_StreamFree(PlaybackStream)
         End If
     End Sub
+#End Region
+
+
 End Class

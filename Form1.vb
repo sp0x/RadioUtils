@@ -8,6 +8,7 @@ Public Class Form1
     Public Property StreamPlayer As StreamPlayer
     
     Public Sub Loaded() Handles Me.Load
+        On Error Resume Next
         ''Dim buu As Int32() = New Int32(8192) {}
         ''Dim fl As String = "g:\downloads\music.mp3"
         ''Dim si As IntPtr = BASS_StreamCreatePush(44100, 1, 0, Nothing)
