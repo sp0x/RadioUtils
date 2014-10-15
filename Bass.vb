@@ -321,12 +321,6 @@ Public Module Bass
     Public Const STREAMFILE_BUFFER = 1
     Public Const STREAMFILE_BUFFERPUSH = 2
 
-    Public Structure BASS_FILEPROCS
-        Public close As Long
-        Public length As Long
-        Public read As Long
-        Public seek As Long
-    End Structure
 
     ' BASS_StreamPutFileData options
     Public Const BASS_FILEDATA_END = 0 ' end & close the file
@@ -810,6 +804,8 @@ Public Module Bass
     <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
     Public Function BASS_StreamCreateFileUser(system As BASSStreamSystem, flags As BassFlag, procs As BASS_FILEPROCS, user As IntPtr) As Integer
     End Function
+
+
     Public Enum BassStreamSystem
         StreamfileNobuffer
         StreamfileBuffer
@@ -852,10 +848,6 @@ Public Module Bass
     Public Function BASS_Free() As Boolean
     End Function
 
-
-
-    Declare Function BASS_StreamCreateFileUser Lib "bass.dll" (ByVal system As Long, ByVal flags As Long,
-                                                              ByVal procs As Long, ByVal user As Long) As Long
     Declare Function BASS_StreamFree Lib "bass.dll" (ByVal handle As IntPtr) As Long
     Declare Function BASS_StreamGetFilePosition Lib "bass.dll" (ByVal handle As IntPtr,
                                                                ByVal mode As BASSStreamFilePosition) As Long
@@ -1044,6 +1036,22 @@ Public Module Bass
     <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
     Public Function BASS_StreamPutData(handle As IntPtr, buffer As Int32(), length As Integer) As Integer
     End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutFileData(handle As Integer, buffer As IntPtr, length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutFileData(handle As Integer, buffer As Byte(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutFileData(handle As Integer, buffer As Short(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutFileData(handle As Integer, buffer As Integer(), length As Integer) As Integer
+    End Function
+    <DllImport("bass.dll", CharSet:=CharSet.Auto)> _
+    Public Function BASS_StreamPutFileData(handle As Integer, buffer As Single(), length As Integer) As Integer
+    End Function
+
     'Public Function Bass_StreamPutData(handle As IntPtr, buffer As Byte(), len As Int32) As Int32
     '    ReDim Preserve buffer(len - 1)
     '    Dim lpBuff As IntPtr = ToPtr(buffer)
@@ -1168,7 +1176,16 @@ Public Module Bass
 #Region " BASS Callback Delegate Functions "
     Public Delegate Sub Syncproc(handle As Integer, channel As Integer, data As Integer, user As IntPtr)
     Public Delegate Sub Downloadproc(buffer As IntPtr, length As Integer, user As IntPtr)
-    Public Delegate Function STREAMPROC(handle As IntPtr, buffer As IntPtr, length As Int32, user As IntPtr) As Int32
+    Public Delegate Function Streamproc(handle As IntPtr, buffer As IntPtr, length As Int32, user As IntPtr) As Int32
+    Public Delegate Sub Filecloseproc(user As IntPtr)
+    Public Delegate Function Filelenproc(user As IntPtr) As Long
+    Public Delegate Function Filereadproc(buffer As IntPtr, length As Integer, user As IntPtr) As Integer
+    Public Delegate Function FilereadprocEx(buffer As Byte(), length As Integer, user As IntPtr) As Integer
+    Public Delegate Function Fileseekproc(offset As Long, user As IntPtr) As Boolean
+
+
+
+
 
 #End Region
 End Module

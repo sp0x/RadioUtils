@@ -39,10 +39,24 @@ Public Class StreamPlayer
     End Function
 #End Region
 
+    Private Function ExecuteAudioStream(buffer As IntPtr, length As Integer, user As IntPtr) As Int32
+        Dim nRead As Int32
+        If BaseStream IsNot Nothing AndAlso BaseStream.CanRead Then
+            nRead = BaseStream.Read(AudioBuffer, 0, length)
+            Position += nRead
+        End If
+        If nRead > 0 Then Marshal.Copy(AudioBuffer, 0, buffer, nRead)
+        Return nRead
+    End Function
+
     Public Function Initialize() As Boolean
         InitBass()
-        PlaybackStream = BASS_StreamCreatePush(44100, 1, BassFlag.BassDefault, Nothing)
+        Dim fileproc As New BASS_FILEPROCS(Nothing, Nothing, Nothing, Nothing)
+        fileproc.close = New Filecloseproc(Sub(user As IntPtr) Trace.WriteLine("closeproc"))
+        fileproc.length = New Filelenproc(Function(user As IntPtr) 0)
+        fileproc.read = AddressOf ExecuteAudioStream
 
+        PlaybackStream = BASS_StreamCreateFileUser(BassStreamSystem.StreamfileBuffer, BASS_STREAM_BLOCK Or BASS_STREAM_STATUS Or BASS_STREAM_AUTOFREE, fileproc, IntPtr.Zero)
         If PlaybackStream = IntPtr.Zero Then
             PlaybackStream = BASS_ErrorGetCode
             Dim err As BassError = PlaybackStream
@@ -50,26 +64,15 @@ Public Class StreamPlayer
         End If
         Return Not PlaybackStream = IntPtr.Zero
     End Function
-    Private totalQueued As Int32 = 0
-    Private Sub _pushBuffer(pBuffer As Byte(), Optional len As Int32 = 0)
-        If pBuffer.Length = 0 Then Return
-        Dim dataplaced = Bass.BASS_StreamPutData(PlaybackStream, pBuffer, len / 8)
-    End Sub
-
-
-    '''/* get size of a buffer to hold nSamples */
-    Public Shared Function samplesToBytes(nSamples As Int32, sampleSizeBits As Int32) As Int32
-        Return nSamples * (sampleSizeBits / 8)
-    End Function
 
 
 
-    Private Sub _playPlayback()
+    Private Sub DoPlayback()
         Dim pflag As Boolean = Bass.BASS_ChannelPlay(PlaybackStream, False)
         If pflag Then
             ' playing...
         Else
-            Trace.WriteLine(String.Format("Err= {0}", Bass.BASS_ErrorGetCode()))
+            Trace.WriteLine(String.Format("PlayErr= {0}", Bass.BASS_ErrorGetCode()))
         End If
     End Sub
 
@@ -81,12 +84,12 @@ Public Class StreamPlayer
             End If
         End If
         Do While BaseStream.CanRead
-            Dim nRead As Int32 = BaseStream.Read(buff, 0, buff.Length)
-            Position += nRead
+            ' ''Dim nRead As Int32 = BaseStream.Read(buff, 0, buff.Length)
+            ' ''Position += nRead
             ' Trace.WriteLine(String.Format("Red {0} bytes", nRead))
             'If nRead = 0 Then Exit Do
-            _pushBuffer(buff, nRead)
-            _playPlayback()
+            '   _pushBuffer(buff, nRead)
+            '    _playPlayback()
 
             'If pFlag > -1 Then
             '    ' playing...

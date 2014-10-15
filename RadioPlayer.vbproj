@@ -80,6 +80,7 @@
     <Compile Include="BASSError.vb" />
     <Compile Include="BASSFlag.vb" />
     <Compile Include="BASSTag.vb" />
+    <Compile Include="BASS_FILEPROC.vb" />
     <Compile Include="clsFileIo.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="Form1.vb">
